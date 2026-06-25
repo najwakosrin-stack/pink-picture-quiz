@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Pink Picture Quiz Game</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#ffb6d9,#ffcce6,#ffd6eb);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    background:white;
+    width:900px;
+    max-width:100%;
+    border-radius:30px;
+    padding:35px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.15);
+    border:4px solid #ffd1e8;
+}
+
+h1{
+    color:#ff4f9a;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#888;
+    margin-bottom:20px;
+}
+
+.score-box{
+    background:#ffe6f2;
+    display:inline-block;
+    padding:12px 25px;
+    border-radius:30px;
+    font-weight:600;
+    color:#ff4f9a;
+    margin-bottom:20px;
+}
+
+.question{
+    font-size:28px;
+    font-weight:700;
+    color:#444;
+    margin:25px 0;
+}
+
+.button-group{
+    margin-bottom:20px;
+}
+
+.start-btn,
+.reset-btn{
+    border:none;
+    color:white;
+    padding:14px 30px;
+    border-radius:50px;
+    font-size:18px;
+    cursor:pointer;
+    margin:5px;
+    transition:0.3s;
+}
+
+.start-btn{
+    background:#ff69b4;
+}
+
+.start-btn:hover{
+    background:#ff4f9a;
+}
+
+.reset-btn{
+    background:#ff9ecf;
+}
+
+.reset-btn:hover{
+    background:#ff6bb5;
+}
+
+.game-area{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+.card:hover{
+    transform:translateY(-8px) scale(1.03);
+    border:3px solid #ff9ecf;
+}
+
+.card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+}
+
+.card p{
+    padding:15px;
+    font-weight:600;
+    color:#555;
+}
+
+.result{
+    margin-top:20px;
+    font-size:22px;
+    font-weight:600;
+}
+
+.correct{
+    color:#16a34a;
+}
+
+.wrong{
+    color:#dc2626;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+```
+<h1>🌸 Picture Quiz Game 🌸</h1>
+<p class="subtitle">Choose the correct picture!</p>
+
+<div class="score-box">
+    ⭐ Score: <span id="score">0</span>
+</div>
+
+<div class="button-group">
+    <button class="start-btn" onclick="startGame()">
+        ▶ Start Game
+    </button>
+
+    <button class="reset-btn" onclick="resetGame()">
+        🔄 Reset Game
+    </button>
+</div>
+
+<div class="question" id="question">
+    Click Start Game
+</div>
+
+<div class="game-area" id="gameArea"></div>
+
+<div class="result" id="result"></div>
+```
+
+</div>
+
+<script>
+
+let score = 0;
+let current = 0;
+
+const questions = [
+
+{
+question:"🍎 Choose the APPLE",
+answer:"Apple",
+images:[
+{
+name:"Apple",
+img:"https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=500"
+},
+{
+name:"Banana",
+img:"https://images.unsplash.com/photo-1603833665858-e61d17a86224?w=500"
+},
+{
+name:"Orange",
+img:"https://images.unsplash.com/photo-1580052614034-c55d20bfee3b?w=500"
+}
+]
+},
+
+{
+question:"🐱 Choose the CAT",
+answer:"Cat",
+images:[
+{
+name:"Cat",
+img:"https://images.unsplash.com/photo-1511044568932-338cba0ad803?w=500"
+},
+{
+name:"Dog",
+img:"https://images.unsplash.com/photo-1517849845537-4d257902454a?w=500"
+},
+{
+name:"Rabbit",
+img:"https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=500"
+}
+]
+},
+
+{
+question:"🐶 Choose the DOG",
+answer:"Dog",
+images:[
+{
+name:"Dog",
+img:"https://images.unsplash.com/photo-1517849845537-4d257902454a?w=500"
+},
+{
+name:"Cat",
+img:"https://images.unsplash.com/photo-1511044568932-338cba0ad803?w=500"
+},
+{
+name:"Rabbit",
+img:"https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=500"
+}
+]
+}
+
+];
+
+function loadQuestion(){
+
+let q = questions[current];
+
+document.getElementById("question").innerHTML = q.question;
+document.getElementById("result").innerHTML = "";
+
+let gameArea = document.getElementById("gameArea");
+gameArea.innerHTML = "";
+
+q.images.forEach(item => {
+
+let card = document.createElement("div");
+card.className = "card";
+
+card.innerHTML = `
+<img src="${item.img}" alt="${item.name}">
+<p>${item.name}</p>
+`;
+
+card.onclick = () => checkAnswer(item.name);
+
+gameArea.appendChild(card);
+
+});
+
+}
+
+function checkAnswer(choice){
+
+let q = questions[current];
+
+if(choice === q.answer){
+
+score++;
+
+document.getElementById("score").innerHTML = score;
+
+document.getElementById("result").innerHTML =
+"✅ Correct!";
+
+document.getElementById("result").className =
+"result correct";
+
+}else{
+
+document.getElementById("result").innerHTML =
+"❌ Wrong Answer!";
+
+document.getElementById("result").className =
+"result wrong";
+
+}
+
+setTimeout(() => {
+
+current++;
+
+if(current < questions.length){
+
+loadQuestion();
+
+}else{
+
+document.getElementById("question").innerHTML =
+`🏆 Game Over! Final Score: ${score}/${questions.length}`;
+
+document.getElementById("gameArea").innerHTML = "";
+
+document.getElementById("result").innerHTML =
+"🎉 Excellent Work! 🎉";
+
+}
+
+},1000);
+
+}
+
+function startGame(){
+
+score = 0;
+current = 0;
+
+document.getElementById("score").innerHTML = "0";
+
+loadQuestion();
+
+}
+
+function resetGame(){
+
+score = 0;
+current = 0;
+
+document.getElementById("score").innerHTML = "0";
+
+document.getElementById("question").innerHTML =
+"Click Start Game";
+
+document.getElementById("result").innerHTML = "";
+
+document.getElementById("gameArea").innerHTML = "";
+
+}
+
+</script>
+
+</body>
+</html>
